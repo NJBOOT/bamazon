@@ -2,6 +2,8 @@ var mysql = require('mysql');
 var inquirer = require('inquirer');
 var table = require('console.table');
 
+let item = ""
+let quantityOrder = 0
 
 let connection = mysql.createConnection({
     host: "localhost",
@@ -27,7 +29,7 @@ function display() {
         if (err) throw err;
         console.table(res);
         chooseProduct();
-          
+
     })
 }
 
@@ -37,51 +39,50 @@ function chooseProduct() {
             type: "input",
             message: "What is the ID of the item you want to buy?",
             name: "choice",
-            validate: function (input){
+            validate: function (input) {
                 var checked = parseInt(input)
-                if (checked >= 1 && checked <=10)
+                if (checked >= 1 && checked <= 10)
                     return true
                 else
-                console.log("\nPlease enter a valid number")
+                    console.log("\nPlease enter a valid number")
             }
         },
         {
             type: "input",
             message: "How many units would you like to purchase?",
             name: "quantity",
-            validate: function (input){
+            validate: function (input) {
                 var checked = parseInt(input)
-                if (checked >= 1 && checked <=500)
+                if (checked >= 1 && checked <= 500)
                     return true
                 else
-                console.log("\nPlease enter a valid number")   
+                    console.log("\nPlease enter a valid number")
+            }
         }
-    }
-    ]).then(function(answer) {
-        console.log(answer)
-        connection.query('SELECT * FROM products WHERE item_id = ?', [answer.choice], function(err, res){
+    ]).then(function (answer) {
+        connection.query('SELECT * FROM products WHERE item_id = ?', [answer.choice], function (err, res) {
             if (err) throw err;
-            console.log(res)
-            let item = res
-            let quantity = res[0].stock_quantity
-            console.log(quantity)
-            let quantityOrder = answer.quantity
-            console.log(quantityOrder)
-            if (quantity > quantityOrder){
-                // completeOrder();
-            } else console.log ("Insufficient Quantity") 
-            connection.end(); 
+            item = res[0];
+            quantityOrder = answer.quantity;
+            let quantity = res[0].stock_quantity;
+            if (quantity > quantityOrder) {
+               completeOrder(item, quantityOrder);
+            } else console.log("Insufficient Quantity")
         })
 
     })
 }
 
-function completeOrder () {
-connection.query ("UPDATE products SET product_sales = product_sales + ?, ? WHERE ?",
-[
+function completeOrder(item, quantityOrder) {
+    connection.query("UPDATE products SET ? WHERE ?",
+        [
+            { stock_quantity: item.stock_quantity - quantityOrder},
+            { item_id: item.item_id }
 
-]
-,function (err,res){
+        ],
+        function (err, res) {
+            console.log(`\nYou just purchased ${quantityOrder} units of ${item.product_name}.\n Your total was $${quantityOrder * item.price}.`)
 
-})
+        })
+    connection.end()
 }
