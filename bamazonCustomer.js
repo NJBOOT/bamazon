@@ -41,7 +41,7 @@ function chooseProduct() {
             name: "choice",
             validate: function (input) {
                 var checked = parseInt(input)
-                if (checked >= 1 && checked <= 10)
+                if (checked >= 1 && checked <= 100)
                     return true
                 else
                     console.log("\nPlease enter a valid number")
@@ -66,7 +66,7 @@ function chooseProduct() {
             quantityOrder = answer.quantity;
             let quantity = res[0].stock_quantity;
             if (quantity > quantityOrder) {
-               completeOrder(item, quantityOrder);
+                completeOrder(item, quantityOrder);
             } else console.log("Insufficient Quantity")
         })
 
@@ -76,7 +76,7 @@ function chooseProduct() {
 function completeOrder(item, quantityOrder) {
     connection.query("UPDATE products SET ? WHERE ?",
         [
-            { stock_quantity: item.stock_quantity - quantityOrder},
+            { stock_quantity: item.stock_quantity - quantityOrder },
             { item_id: item.item_id }
 
         ],
