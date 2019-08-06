@@ -18,17 +18,7 @@ let connection = mysql.createConnection({
 
 connection.connect(function (err) {
     if (err) throw err;
-    console.log("You are connected thread: " + connection.threadId)
 });
-
-function isNumber (input) {
-    var checker = parseInt(input)
-    if (!isNaN(checker) && checker > 0)
-        return true
-    else {
-        console.log("Please enter a valid number")
-    }
-}
 
 menu();
 
